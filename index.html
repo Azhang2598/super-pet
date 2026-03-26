@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>械逅机械——27年中农868机械设计全程旗舰班</title>
+    <style>
+        :root {
+            --cau-green: #00953a;
+            --cool-blue: #007bff; /* 浅色模式下调深蓝色以保证对比度 */
+            --neon-accent: #28a745; /* 调整为深一点的绿色 */
+            --light-bg: #f8f9fa; /* 浅色背景 */
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --text-main: #333;
+            --text-sub: #666;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; cursor: default; }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-main);
+            overflow: hidden; 
+            line-height: 1.6;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.5; /* 降低背景粒子干扰 */
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            flex-shrink: 0;
+            padding: 10vh 8vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            transition: opacity 0.6s, transform 0.6s ease-out;
+        }
+
+        .slide.active { opacity: 1; transform: scale(1) translateY(0); }
+
+        /* 顶部 Logo 样式 */
+        .header-logos {
+            position: absolute;
+            top: 4vh;
+            left: 5vw;
+            display: flex;
+            align-items: center;
+            z-index: 10;
+        }
+        .header-logos img { height: 50px; filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1)); }
+
+        /* 标题增强 */
+        .slide-title {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #333, var(--cool-blue), var(--cau-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6vh;
+            text-align: center;
+        }
+
+        .slide-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: var(--cau-green);
+            margin: 15px auto;
+            border-radius: 2px;
+            box-shadow: 0 2px 10px rgba(0, 149, 58, 0.3);
+        }
+
+        /* 浅色毛玻璃卡片系统 */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--cool-blue);
+            box-shadow: 0 15px 45px rgba(0, 123, 255, 0.15);
+            background: #fff;
+        }
+
+        .card-emoji { font-size: 2.5rem; margin-bottom: 15px; display: block; }
+        .card h3 { color: var(--cool-blue); font-size: 1.6rem; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+        .card p { color: var(--text-sub); }
+
+        /* 表格美化 */
+        .package-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            margin-top: -20px;
+        }
+        .package-table th { padding: 20px; color: var(--cool-blue); font-size: 1.1rem; border-bottom: 2px solid var(--glass-border); }
+        .package-table td { padding: 15px; background: rgba(0,0,0,0.02); text-align: center; border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); color: var(--text-main); }
+        .package-table td:first-child { border-left: 1px solid var(--glass-border); border-radius: 12px 0 0 12px; text-align: left; padding-left: 25px; }
+        .package-table td:last-child { border-right: 1px solid var(--glass-border); border-radius: 0 12px 12px 0; }
+        
+        .check { color: #28a745; font-weight: bold; font-size: 1.3rem; }
+        .cross { color: #dc3545; font-size: 1.1rem; opacity: 0.6; }
+
+        /* 成绩与价格 */
+        .highlight-super {
+            font-size: 4rem;
+            color: var(--cau-green);
+            text-shadow: 0 2px 10px rgba(40, 167, 69, 0.2);
+            font-weight: 900;
+        }
+
+        .price-tag {
+            font-size: 3.5rem;
+            color: var(--text-main);
+            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+
+        /* 底部导航按钮 */
+        .nav-controls {
+            position: fixed;
+            bottom: 5vh;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 25px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: #fff;
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--cool-blue);
+            color: #fff;
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+        }
+
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .premium-badge {
+            background: linear-gradient(90deg, #ff00cc, #3333ff);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+
+    <div class="header-logos">
+        <img src="中国农业大学_logo2.png" alt="中农Logo"> 
+    </div>
+
+    <div class="container" id="ppt-container">
+
+        <section class="slide active">
+            <h1 style="font-size: 5rem; line-height: 1.2; margin-bottom: 20px; color: var(--text-main);">🚜 械逅机械 · 27考研</h1>
+            <h2 style="font-size: 2rem; color: var(--cool-blue); letter-spacing: 2px;">✨中国农业大学《868机械设计》全体系辅导介绍✨</h2>
+            <div style="margin: 40px 0; display: flex; gap: 20px;">
+                <span style="background: var(--cau-green); color: #fff; padding: 10px 25px; border-radius: 50px; font-weight: bold;">💎 一条龙服务</span>
+                <span style="background: var(--cool-blue); padding: 10px 25px; border-radius: 50px; font-weight: bold; color: #fff;">🍼 保姆级答疑</span>
+                <span style="background: #333; padding: 10px 25px; border-radius: 50px; font-weight: bold; color: #fff;">🚩 真旗舰资料</span>
+            </div>
+            <p style="margin-top: 3vh; font-style: italic;">“械”逅上岸，从这里开始</p>
+        </section>
+
+        <section class="slide">
+            <h2 class="slide-title">🥇 阶梯式课程套餐对比</h2>
+            <table class="package-table">
+                <thead>
+                    <tr>
+                        <th>包含课程/资料</th>
+                        <th>刷题班<br>588元</th>
+                        <th>精讲基础班<br>998元</th>
+                        <th>强化+冲刺班<br>998元</th>
+                        <th>全程旗舰班<br>1888元</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>✨ 导学与启蒙课</td><td class="check">✔</td><td class="check">✔</td><td class="check">✔</td><td class="check">✔</td></tr>
+                    <tr><td>🧱 868基础精讲 (30课时)</td><td class="cross">✘</td><td class="check">✔</td><td class="cross">✘</td><td class="check">✔</td></tr>
+                    <tr><td>🔥 868强化精讲 (30课时)</td><td class="cross">✘</td><td class="cross">✘</td><td class="check">✔</td><td class="check">✔</td></tr>
+                    <tr><td>📖 历年真题/难题精讲</td><td class="check">✔</td><td class="cross">✘</td><td class="check">✔</td><td class="check">✔</td></tr>
+                    <tr><td>📦 全套 10 册护眼纸资料</td><td class="check">✔</td><td class="check">✔</td><td class="cross">✘*</td><td class="check">✔</td></tr>
+                    <tr><td>💬 保姆级 1v1 答疑</td><td class="check">✔</td><td class="check">✔</td><td class="check">✔</td><td class="check">✔</td></tr>
+                </tbody>
+            </table>
+            <p style="margin-top: 20px; font-size: 0.9rem; color: var(--cool-blue);">*注：强化+冲刺班学员补较低差价即可配齐资料。</p>
+        </section>
+
+<section class="slide" id="slide-audience">
+            <h2 class="slide-title">这些问题是否正困扰着你？</h2>
+            <div class="grid-container">
+                <div class="card">
+                    <h3>时间紧迫</h3>
+                    <p>不仅要复习专业课，还要兼顾英语、政治，时间根本不够用？</p>
+                </div>
+                <div class="card">
+                    <h3>资料繁杂</h3>
+                    <p>市面上资料良莠不齐，课程质量令人担忧，不知道哪份才是真正针对中农868的？不知道谁的课才是真正有水平的？</p>
+                </div>
+                <div class="card">
+                    <h3>基础薄弱</h3>
+                    <p>本科没学好，自己是跨考，面对复杂的公式和图表感到无从下手？面对繁杂的章节不知从何学起？</p>
+                </div>
+                <div class="card">
+                    <h3>目标高分</h3>
+                    <p>想要一次性高分上岸，但不知道如何突破瓶颈，同大家拉开差距？</p>
+                </div>
+            </div>
+            <p style="margin-top: 4vh; color: var(--neon-accent); font-weight: bold;">如果你的回答是"是"，那么械逅旗舰班将是你的终极解决方案。</p>
+        </section>
+
+
+       <section class="slide" id="slide-teaching-system">
+            <h2 class="slide-title">三位一体 · 全程教学体系</h2>
+            
+            <style>
+                .system-container {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 30px;
+                    width: 100%;
+                    max-width: 1150px;
+                    align-items: stretch;
+                }
+
+                .system-card {
+                    background: #fff;
+                    border: 1px solid #eee;
+                    border-radius: 24px;
+                    padding: 40px 25px;
+                    text-align: center;
+                    display: flex;
+                    flex-direction: column;
+                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                    position: relative;
+                }
+
+                .system-card:hover {
+                    transform: translateY(-12px);
+                    box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+                    border-color: var(--cool-blue);
+                }
+
+                /* 旗舰班高亮样式 */
+                .system-card.flagship-card {
+                    border: 2px solid var(--cau-green);
+                    background: linear-gradient(180deg, #fff 0%, #f6ffed 100%);
+                    box-shadow: 0 10px 30px rgba(0, 149, 58, 0.1);
+                }
+
+                .flagship-badge {
+                    position: absolute;
+                    top: -15px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: linear-gradient(90deg, var(--cau-green), #52c41a);
+                    color: #fff;
+                    padding: 5px 20px;
+                    border-radius: 50px;
+                    font-size: 0.85rem;
+                    font-weight: 800;
+                    box-shadow: 0 4px 10px rgba(0, 149, 58, 0.2);
+                }
+
+                .sys-icon { font-size: 3.5rem; margin-bottom: 20px; display: block; }
+                .sys-name { font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-bottom: 15px; }
+                .sys-detail { font-size: 1rem; color: var(--text-sub); line-height: 1.6; flex-grow: 1; text-align: left; }
+                
+                .sys-detail li {
+                    margin-bottom: 8px;
+                    list-style: none;
+                    display: flex;
+                    gap: 8px;
+                }
+            </style>
+
+            <div class="system-container">
+                <div class="system-card">
+                    <span class="sys-icon">🧱</span>
+                    <h3 class="sys-name">精讲基础班</h3>
+                    <div class="sys-detail">
+                        <li>🥇 全书知识点深度覆盖</li>
+                        <li>🥇 从预备知识到基础夯实</li>
+                        <li>🥇 零基础、跨考生也能轻松拿捏</li>
+                    </div>
+                </div>
+
+                <div class="system-card" style="border-color: var(--cool-blue); background: #f0f7ff;">
+                    <span class="sys-icon">🚀</span>
+                    <h3 class="sys-name">强化 + 冲刺班</h3>
+                    <div class="sys-detail">
+                        <li>🥇 强化知识串讲</li>
+                        <li>🥇 计算题/分析题/轴系改错专项总结突破</li>
+                        <li>🥇 仿真卷精讲</li>
+                        <li>🥇 其他</li>
+                    </div>
+                </div>
+
+                <div class="system-card flagship-card">
+                    <div class="flagship-badge">TOP CHOICE · 一条龙服务</div>
+                    <span class="sys-icon">🏆</span>
+                    <h3 class="sys-name">全程旗舰班</h3>
+                    <div class="sys-detail">
+                        <li>🥇 <strong>包含基础+强化+冲刺全阶段课程</strong></li>
+                        <li>🥇 包含所有纸质资料</li>
+                        <li>🥇 无二次收费</li>
+                        <li>🥇 从启蒙到初试结束全程保驾护航</li>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+<section class="slide" id="slide-materials">
+            <h2 class="slide-title">📚 27考研旗舰资料大览 (全11册+新大纲冲刺卷*套)</h2>
+            
+            <style>
+                /* 局部优化样式 */
+                .material-grid-v2 {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 20px;
+                    width: 100%;
+                    max-width: 1100px;
+                }
+
+                .material-card {
+                    background: #ffffff;
+                    border: 1px solid #eee;
+                    border-radius: 20px;
+                    padding: 25px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                    transition: all 0.4s ease;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+                }
+
+                .material-card:hover {
+                    transform: translateY(-8px);
+                    box-shadow: 0 12px 30px rgba(0, 123, 255, 0.12);
+                    border-color: var(--cool-blue);
+                }
+
+                .mat-icon {
+                    font-size: 2.8rem;
+                    margin-bottom: 15px;
+                }
+
+                .mat-name {
+                    font-size: 1.25rem;
+                    font-weight: 800;
+                    color: var(--text-main);
+                    margin-bottom: 8px;
+                }
+
+                .mat-desc {
+                    font-size: 0.9rem;
+                    color: var(--text-sub);
+                    line-height: 1.4;
+                }
+
+                .badge-new {
+                    background: #fff0f0;
+                    color: #ff4d4f;
+                    font-size: 0.75rem;
+                    padding: 2px 8px;
+                    border-radius: 4px;
+                    margin-left: 5px;
+                    vertical-align: middle;
+                }
+
+                .print-info {
+                    margin-top: 5vh;
+                    background: #e6f7ff;
+                    border: 1px dashed var(--cool-blue);
+                    padding: 12px 30px;
+                    border-radius: 50px;
+                    color: var(--cool-blue);
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+            </style>
+
+            <div class="material-grid-v2">
+                <div class="material-card">
+                    <div class="mat-icon">📜</div>
+                    <div class="mat-name">历年真题</div>
+                    <div class="mat-desc">试题册 + 独家精准解析册</div>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-icon">🧪</div>
+                    <div class="mat-name">千题百炼</div>
+                    <div class="mat-desc">小题专项专攻<br><span style="color:var(--cau-green)">精准复现26考研90%原题</span></div>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-icon">⚔️</div>
+                    <div class="mat-name">百炼成钢</div>
+                    <div class="mat-desc">大题专项突破<br>历年核心大题全覆盖，考场降维打击</div>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-icon">🏹</div>
+                    <div class="mat-name">刻意练习 <span class="badge-new">NEW</span></div>
+                    <div class="mat-desc">新增进阶资料，助你更上一层楼<br>试题册 + 深度解析</div>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-icon">📝</div>
+                    <div class="mat-name">仿真卷 / 答题卡</div>
+                    <div class="mat-desc">全场还原真实考场体验<br>提前适应实战节奏</div>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-icon">📒</div>
+                    <div class="mat-name">核心知识点手册 <span class="badge-new">NEW</span></div>
+                    <div class="mat-desc">新增 120页+ 精华干货<br>章节点播 + 公式速查</div>
+                </div>
+            </div>
+
+            <div class="print-info">
+                <span>🍃</span> 所有纸质资料均采用护眼纸印刷，解析精准至逐题，助你高效备考。
+            </div>
+        </section>
+
+        <section class="slide">
+            <h2 class="slide-title">为什么选择械逅机械？</h2>
+            <div class="grid-container">
+                <div class="card">
+                    <h3>🎯 精准考点把握</h3>
+                    <p>真正意义上的中农868辅导，准确把握所有考点、难点，避免无用功。</p>
+                </div>
+                <div class="card">
+                    <h3>🔥 高分命中保障</h3>
+                    <p>26考研试卷起码有 130分为讲过的类似题或原题！命中率极高。</p>
+                </div>
+                <div class="card">
+                    <h3>👨‍🏫 保姆级 1v1 答疑</h3>
+                    <p>145分学长全程答疑，搭配专属1v1答疑及群内极速响应，速度NO.1。</p>
+                </div>
+                <div class="card">
+                    <h3>🏆 辉煌高分背书</h3>
+                    <p>26届战绩：最高分145分 2人，大量 130+ ，120+学员高分见证。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <h2 class="slide-title">📚 备考教材必读指南</h2>
+            <div style="display: flex; gap: 40px; width: 100%; max-width: 1000px;">
+                <div class="card" style="flex: 1;">
+                    <div class="premium-badge">必备推荐</div>
+                    <h3>刘莹《机械设计教程》</h3>
+                    <p>中农初试推荐教材（第3版），配合械逅配套注解效果更佳。</p>
+                </div>
+                <div class="card" style="flex: 1;">
+                    <h3>濮良贵《机械设计》</h3>
+                    <p>权威教辅（第10版），知识点更细更丰富，作为高分补充资料。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide-price-system">
+            <h2 class="slide-title">💰 公开透明的价格体系</h2>
+
+            <style>
+                .price-container {
+                    display: flex;
+                    gap: 30px;
+                    width: 100%;
+                    max-width: 1150px;
+                    align-items: stretch;
+                }
+
+                .price-card {
+                    flex: 1;
+                    background: #fff;
+                    border: 1px solid #eee;
+                    border-radius: 24px;
+                    padding: 35px 25px;
+                    display: flex;
+                    flex-direction: column;
+                    transition: all 0.4s ease;
+                    position: relative;
+                }
+
+                /* 资料包 B 特殊样式 */
+                .price-card.best-value {
+                    border: 2px solid var(--cool-blue);
+                    box-shadow: 0 10px 30px rgba(0, 123, 255, 0.15);
+                    transform: scale(1.05);
+                    z-index: 2;
+                }
+
+                .value-tag {
+                    position: absolute;
+                    top: -15px;
+                    right: 20px;
+                    background: linear-gradient(90deg, #ff4d4f, #ff7875);
+                    color: #fff;
+                    padding: 4px 15px;
+                    border-radius: 10px;
+                    font-size: 0.9rem;
+                    font-weight: bold;
+                    box-shadow: 0 4px 10px rgba(255, 77, 79, 0.3);
+                }
+
+                .price-header {
+                    font-size: 1.4rem;
+                    font-weight: 800;
+                    margin-bottom: 10px;
+                    color: var(--text-main);
+                }
+
+                .price-amount {
+                    font-size: 3rem;
+                    font-weight: 900;
+                    margin: 15px 0;
+                    color: var(--text-main);
+                }
+
+                .price-amount span {
+                    font-size: 1.2rem;
+                    font-weight: normal;
+                    color: var(--text-sub);
+                }
+
+                .feature-list {
+                    list-style: none;
+                    text-align: left;
+                    margin: 20px 0;
+                    flex-grow: 1;
+                }
+
+                .feature-list li {
+                    padding: 8px 0;
+                    font-size: 0.95rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    color: #555;
+                }
+
+                .upgrade-hint {
+                    background: #f0f7ff;
+                    color: var(--cool-blue);
+                    padding: 10px;
+                    border-radius: 12px;
+                    font-size: 0.85rem;
+                    font-weight: bold;
+                    margin-top: 15px;
+                }
+
+                .promise-bar {
+                    grid-column: span 2;
+                    margin-top: 40px;
+                    width: 100%;
+                    background: #f6ffed;
+                    border: 1px solid #b7eb8f;
+                    border-radius: 15px;
+                    padding: 15px 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 15px;
+                }
+            </style>
+
+            <div class="price-container">
+                <div class="price-card">
+                    <div class="price-header">📦 资料包 A</div>
+                    <div style="color:var(--text-sub); font-size: 0.9rem;">基础必备 · 保姆答疑</div>
+                    <div class="price-amount">¥228</div>
+                    <ul class="feature-list">
+                        <li>✅ 《历年真题》试题+解析</li>
+                        <li>✅ 《千题百炼》试题+解析</li>
+                        <li>✅ 《百炼成钢》试题+解析</li>
+                        <li>✅ 《核心知识点手册》[新增]</li>
+                        <li>✅ 包含 26 届全套核心资料</li>
+                    </ul>
+                </div>
+
+                <div class="price-card best-value">
+                    <div class="value-tag">🔥 旗舰推荐 · 性价比之选</div>
+                    <div class="price-header">📦 资料包 B</div>
+                    <div style="color:var(--cool-blue); font-size: 0.9rem;">全套升级 · 进阶拔尖</div>
+                    <div class="price-amount">¥258</div>
+                    <ul class="feature-list">
+                        <li>✅ <strong>包含资料包 A 所有内容</strong></li>
+                        <li>✅ ➕ 《刻意练习》试题册</li>
+                        <li>✅ ➕ 《刻意练习》解析册</li>
+                        <li>✅ ➕ 《高质量模拟卷》*3</li>
+                        <li>✅ 适合追求 140+ 的高分学员</li>
+                    </ul>
+                    <div class="upgrade-hint">
+                        💡 仅多花 30 元，多得 3 本新增进阶资料！
+                    </div>
+                </div>
+
+                <div class="price-card" style="border-color: #b7eb8f; background: #f6ffed;">
+                    <div class="price-header" style="color:#52c41a;">⭐ 郑重承诺</div>
+                    <div style="font-size: 4rem; margin: 20px 0;">🛡️</div>
+                    <p style="font-size: 1.1rem; font-weight: bold; color: #389e0d; line-height: 1.6;">
+                        若发现任何机构在质量、课程、答疑上优于我们，<br>
+                        <span style="font-size: 1.4rem; text-decoration: underline;">全额退款！</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide-cta-final">
+            <style>
+                .cta-wrapper {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    width: 100%;
+                    max-width: 1000px;
+                }
+
+                .cta-hero-text {
+                    font-size: 4rem;
+                    font-weight: 900;
+                    margin-bottom: 10px;
+                    background: linear-gradient(to right, #333, var(--cau-green));
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+
+                .cta-sub-text {
+                    font-size: 1.2rem;
+                    color: var(--text-sub);
+                    margin-bottom: 5vh;
+                }
+
+                /* 咨询主卡片布局 */
+                .contact-matrix {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 20px;
+                    width: 100%;
+                }
+
+                .contact-item {
+                    background: #fff;
+                    border: 1px solid #eee;
+                    border-radius: 20px;
+                    padding: 25px;
+                    display: flex;
+                    align-items: center;
+                    gap: 20px;
+                    transition: all 0.3s ease;
+                    text-align: left;
+                }
+
+                .contact-item:hover {
+                    transform: scale(1.03);
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+                    border-color: var(--cool-blue);
+                }
+
+                .icon-box {
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 15px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 2rem;
+                }
+
+                .info-content h4 {
+                    font-size: 0.9rem;
+                    color: var(--text-sub);
+                    margin-bottom: 4px;
+                    font-weight: normal;
+                }
+
+                .info-content p {
+                    font-size: 1.2rem;
+                    font-weight: 800;
+                    color: var(--text-main);
+                }
+
+                /* 底部激励语 */
+                .footer-quote {
+                    margin-top: 6vh;
+                    text-align: center;
+                }
+
+                .footer-quote h2 {
+                    font-size: 2rem;
+                    color: var(--cau-green);
+                    margin-bottom: 10px;
+                }
+
+                .footer-quote p {
+                    font-style: italic;
+                    color: #999;
+                }
+            </style>
+
+            <div class="cta-wrapper">
+                <h1 class="cta-hero-text">👋 邂逅上岸 · 一研为定</h1>
+                <p class="cta-sub-text">距离成功只差一个聊天框，快来寻找你的上岸领路人吧！</p>
+
+                <div class="contact-matrix">
+                    <div class="contact-item">
+                        <div class="icon-box" style="background: #e8f5e9; color: #2ecc71;">💬</div>
+                        <div class="info-content">
+                            <h4>微信详细咨询 (13学长)</h4>
+                            <p>uuo-998</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="icon-box" style="background: #e3f2fd; color: #2196f3;">👥</div>
+                        <div class="info-content">
+                            <h4>27考研答疑交流群</h4>
+                            <p>1058769143</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="icon-box" style="background: #fff3e0; color: #ff9800;">🛒</div>
+                        <div class="info-content">
+                            <h4>淘宝官方店铺</h4>
+                            <p>械逅机械考研</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="icon-box" style="background: #fce4ec; color: #f06292;">📺</div>
+                        <div class="info-content">
+                            <h4>B站免费试听</h4>
+                            <p>中农械逅机械考研</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-quote">
+                    <h2>“用心做辅导，助力每一位有梦想的中农准研究生”</h2>
+                    <p>曾在备考路上披荆斩棘的我们，深知每一份坚持的力量</p>
+                </div>
+            </div>
+        </section>
+
+<section class="slide" id="slide-final-art">
+            <style>
+                #slide-final-art {
+                    background: radial-gradient(circle at center, #ffffff 0%, #f7f8fa 100%);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                .art-final-container {
+                    text-align: center;
+                    animation: fadeInUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+                }
+
+                /* 优化后的标题：绸缎光泽效果 */
+                .art-thanks {
+                    font-size: 8.5rem;
+                    font-weight: 900;
+                    margin-bottom: 0;
+                    line-height: 1;
+                    letter-spacing: -2px;
+                    /* 柔和的多色阶渐变 */
+                    background: linear-gradient(
+                        to right, 
+                        #444 0%, 
+                        #444 40%, 
+                        #aaa 50%, 
+                        #444 60%, 
+                        #444 100%
+                    );
+                    background-size: 300% auto;
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    /* 使用更长的周期(10s)让流动更缓慢自然 */
+                    animation: soft-flow 10s ease-in-out infinite;
+                    opacity: 0.9;
+                }
+
+                .art-subtitle {
+                    font-size: 1.5rem;
+                    font-weight: 300;
+                    color: var(--cau-green);
+                    letter-spacing: 10px;
+                    margin-top: 10px;
+                    margin-bottom: 10vh;
+                    text-indent: 10px;
+                    opacity: 0.8;
+                }
+
+                /* 仪式感收尾 */
+                .art-end-line {
+                    width: 30px;
+                    height: 1.5px;
+                    background: var(--cau-green);
+                    margin: 0 auto 35px;
+                    opacity: 0.4;
+                }
+
+                .art-slogan {
+                    font-size: 2.6rem;
+                    font-weight: 800;
+                    color: #333;
+                    letter-spacing: 2px;
+                }
+
+                .art-slogan span {
+                    color: var(--cau-green);
+                    position: relative;
+                }
+
+                /* 极简装饰元素 */
+                .art-slogan::before, .art-slogan::after {
+                    content: '—';
+                    margin: 0 15px;
+                    color: #ddd;
+                    font-weight: 200;
+                }
+
+                /* 动画：缓慢流动的绸缎光泽 */
+                @keyframes soft-flow {
+                    0% { background-position: 100% center; }
+                    100% { background-position: -200% center; }
+                }
+
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(40px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            </style>
+
+            <div class="art-final-container">
+                <h1 class="art-thanks">THANKS</h1>
+                <p class="art-subtitle">“械”逅上岸 · 与你同行</p>
+
+                <div class="art-end-line"></div>
+                <div class="art-slogan">全力以赴，我们在<span>中农</span>等你</div>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" id="prev-btn" disabled>⬅️ 上一页</button>
+        <button class="nav-btn" id="next-btn">下一页 ➡️</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 50, density: { enable: true, value_area: 800 } },
+                color: { value: "#333" },
+                shape: { type: "circle" },
+                opacity: { value: 0.1 },
+                size: { value: 2 },
+                line_linked: { enable: true, distance: 150, color: "#999", opacity: 0.1, width: 1 },
+                move: { enable: true, speed: 1 }
+            }
+        });
+
+        const container = document.getElementById('ppt-container');
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        let currentSlide = 0;
+
+        function updateSlides() {
+            container.style.transform = `translateX(-${currentSlide * 100}vw)`;
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+        }
+
+        prevBtn.addEventListener('click', () => { if (currentSlide > 0) { currentSlide--; updateSlides(); } });
+        nextBtn.addEventListener('click', () => { if (currentSlide < slides.length - 1) { currentSlide++; updateSlides(); } });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') prevBtn.click();
+            if (e.key === 'ArrowRight') nextBtn.click();
+        });
+    </script>
+</body>
+</html>
